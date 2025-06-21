@@ -8,51 +8,40 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     background-color: #f0f0f0;
     background-image: url('img/back2.jpg');
-    background-size: cover; /* Добавлено для корректного отображения фона */
-    background-position: center; /* Центрируем фоновое изображение */
+    background-size: cover;
+    background-position: center;
     font-family: Arial, sans-serif;
-    position: relative; /* Для псевдоэлемента затемнения */
+    position: relative;
 }
-
-/* body::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 0;
-} */
 
 .timer-container {
     cursor: default;
     user-select: none;
     text-align: center;
     z-index: 2;
-    background: rgba(255, 255, 255, 0.7); /* Полупрозрачный белый */
-    backdrop-filter: blur(8px); /* Размытие фона для эффекта матового стекла */
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.4); /* Светлая граница для контраста */
+    border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .timer-display {
     font-size: 10rem;
     font-weight: bold;
-    color: #333; /* Темный цвет для хорошей читаемости */
+    color: #333;
     margin-bottom: 30px;
     display: flex;
     justify-content: center;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Легкая тень для контраста */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .sound {
-    position: fixed; /* Изменено на fixed */
+    position: fixed;
     top: 20px;
     right: 20px;
     cursor: pointer;
@@ -60,16 +49,121 @@ body {
     background: rgba(255, 255, 255, 0.7);
     border-radius: 50%;
     padding: 5px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
 }
 
 .sound_icon {
-    width: clamp(30px, 8vw, 50px); /* Адаптивный размер иконки */
+    width: clamp(30px, 8vw, 50px);
     display: block;
 }
 
 .canvas {
     position: absolute;
     z-index: 1;
+    width: 100%;
+    height: 100%;
 }
 
+.inputVolume {
+    position: fixed;
+    top: 35px;
+    right: 100px;
+    width: 100px;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transform: translateX(10px);
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 5px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.activate {
+    opacity: 1;
+}
+
+.inputVolume::-webkit-slider-runnable-track {
+    height: 6px;
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.inputVolume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #333;
+    border-radius: 50%;
+    margin-top: -5px;
+    cursor: pointer;
+}
+
+.inputVolume::-moz-range-track {
+    height: 6px;
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.inputVolume::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #333;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* Медиа-запрос для мобильных устройств */
+@media screen and (max-width: 600px) {
+    .timer-container {
+        padding: 20px;
+        border-radius: 15px;
+        width: 95%;
+        max-width: 400px;
+    }
+
+    .timer-display {
+        font-size: clamp(4rem, 12vw, 6rem); /* Адаптация размера шрифта для часов */
+        margin-bottom: 20px;
+    }
+
+    .sound {
+        top: 10px;
+        right: 10px;
+        padding: 6px;
+    }
+
+    .sound_icon {
+        width: clamp(24px, 6vw, 32px);
+    }
+
+    .inputVolume {
+        top: 10px;
+        right: 60px;
+        width: clamp(70px, 20vw, 90px);
+        padding: 4px;
+    }
+
+    .inputVolume::-webkit-slider-runnable-track {
+        height: 5px;
+    }
+
+    .inputVolume::-webkit-slider-thumb {
+        width: 14px;
+        height: 14px;
+        margin-top: -4.5px;
+    }
+
+    .inputVolume::-moz-range-track {
+        height: 5px;
+    }
+
+    .inputVolume::-moz-range-thumb {
+        width: 14px;
+        height: 14px;
+    }
+}

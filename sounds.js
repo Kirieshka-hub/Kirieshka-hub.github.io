@@ -30,6 +30,8 @@ function randomTrack() {
 }
 
 
+
+
 export const sounds = {
     clickSound: new Howl({
         src: ['sounds/click1.wav'],
@@ -69,6 +71,18 @@ const clock = document.querySelector(".timer-container");
 clock.addEventListener('click', () => {
     sounds.clickSound.play();
 });
+
+// const inputVolume = document.querySelector('.inputVolume');
+// sound_button.addEventListener('mouseenter', () => {
+//     inputVolume.classList.add('activate');
+//     console.log(inputVolume.value);
+    
+
+// });
+
+// sound_button.addEventListener('mouseleave', () => {
+//     inputVolume.classList.remove('activate');
+// });
 
 
 

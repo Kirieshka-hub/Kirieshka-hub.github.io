@@ -19,7 +19,8 @@ const subtitle = new Subtitle({
     },
     color: '#ffffff',
     fontSize: '28px',
-    fontFamily: 'Arial, sans-serif'
+    fontFamily: 'Arial, sans-serif',
+    canvas: canvas
 });
 
 subtitle.show();

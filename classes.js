@@ -251,16 +251,15 @@ export class LoadBar {
 }
 
 export class Subtitle {
-    constructor({ text, position, color = 'white', fontSize = "20px", fontFamily = "Arial" }) {
+    constructor({ text, position, color = 'white', baseFontSize = 20, fontFamily = "Arial", canvas }) {
         this.text = text;
         this.position = position;
         this.color = color;
-        this.fontSize = fontSize;
+        this.baseFontSize = baseFontSize; // Базовый размер шрифта в пикселях
         this.fontFamily = fontFamily;
+        this.canvas = canvas; // Ссылка на канвас для расчета размеров
         this.textAlign = 'center';
         this.textBaseline = 'middle';
-
-        this.font = `${fontSize} ${fontFamily}`;
         this.opacity = 0;
         this.isVisible = false;
 
@@ -299,6 +298,24 @@ export class Subtitle {
         };
         this.lastReactionTime = 0;
         this.reactionCoolDown = 10000;
+
+        // Инициализация адаптивного размера шрифта
+        this.updateFontSize();
+        window.addEventListener('resize', () => this.updateFontSize());
+    }
+
+    // Метод для обновления размера шрифта в зависимости от ширины канваса
+    updateFontSize() {
+        if (!this.canvas) return;
+        // Рассчитываем размер шрифта как процент от ширины канваса
+        const scaleFactor = Math.min(this.canvas.width / 600, 1); // Нормируем относительно 600px
+        this.fontSize = `${this.baseFontSize * scaleFactor}px`;
+        this.font = `${this.fontSize} ${this.fontFamily}`;
+        // Адаптируем отступы и радиус фона пропорционально
+        this.padding = 10 * scaleFactor;
+        this.cornerRadius = 8 * scaleFactor;
+        this.strokeWidth = 1 * scaleFactor;
+        this.shadowBlur = 3 * scaleFactor;
     }
 
     draw(ctx) {
@@ -306,7 +323,7 @@ export class Subtitle {
 
         ctx.save();
 
-        // Стили текста
+        // Обновляем шрифт перед отрисовкой
         ctx.font = this.font;
         ctx.textAlign = this.textAlign;
         ctx.textBaseline = this.textBaseline;
@@ -314,13 +331,13 @@ export class Subtitle {
 
         // Измеряем текст
         const textWidth = ctx.measureText(this.text).width;
-        const textHeight = parseInt(this.fontSize) * 1.2;
+        const textHeight = parseFloat(this.fontSize) * 1.2;
 
         // Координаты для фона
         const bgX = this.position.x - textWidth / 2 - this.padding;
-        const bgY = this.position.y - textHeight / 2 - this.padding; // Подкорректировали Y для 'middle'
+        const bgY = this.position.y - textHeight / 2 - this.padding;
         const bgWidth = textWidth + this.padding * 2;
-        const bgHeight = textHeight + this.padding * 2; // Увеличили высоту фона
+        const bgHeight = textHeight + this.padding * 2;
 
         // Рисуем фон
         ctx.fillStyle = this.backgroundColor;
@@ -367,10 +384,22 @@ export class Subtitle {
 
     updateText(newText) {
         this.text = newText;
-
     }
-    // переделать 
-    showReaction(type) { }
+
+    // Показ случайной реакции для указанного типа
+    // showReaction(type) {
+    //     const currentTime = Date.now();
+    //     if (currentTime - this.lastReactionTime < this.reactionCoolDown) return;
+
+    //     const reactionList = this.reactions[type] || [];
+    //     if (reactionList.length === 0) return;
+
+    //     const randomReaction = reactionList[Math.floor(Math.random() * reactionList.length)];
+    //     this.updateText(randomReaction);
+    //     this.show(1000);
+    //     setTimeout(() => this.hide(1000), 3000); // Скрыть через 3 секунды
+    //     this.lastReactionTime = currentTime;
+    // }
 }
 
 
