@@ -46,10 +46,6 @@ export const sounds = {
 };
 
 
-
-
-
-
 const sound_button = document.querySelector('.sound_icon');
 sound_button.addEventListener('click', () => {
     unlockAudio();

@@ -255,15 +255,15 @@ export class Subtitle {
         this.text = text;
         this.position = position;
         this.color = color;
-        this.baseFontSize = baseFontSize; // Базовый размер шрифта в пикселях
+        this.baseFontSize = baseFontSize; // Base font size in pixels
         this.fontFamily = fontFamily;
-        this.canvas = canvas; // Ссылка на канвас для расчета размеров
+        this.canvas = canvas; // Reference to canvas for size calculations
         this.textAlign = 'center';
         this.textBaseline = 'middle';
         this.opacity = 0;
         this.isVisible = false;
 
-        // Эффекты для текста
+        // Text effects
         this.shadowColor = 'rgba(0, 0, 0, 0.7)';
         this.shadowBlur = 5;
         this.shadowOffsetX = 2;
@@ -299,23 +299,41 @@ export class Subtitle {
         this.lastReactionTime = 0;
         this.reactionCoolDown = 10000;
 
-        // Инициализация адаптивного размера шрифта
+        // Initialize adaptive font size and high-DPI canvas
+        this.setupHighDPI();
         this.updateFontSize();
-        window.addEventListener('resize', () => this.updateFontSize());
+        window.addEventListener('resize', () => {
+            this.setupHighDPI();
+            this.updateFontSize();
+        });
     }
 
-    // Метод для обновления размера шрифта в зависимости от ширины канваса
+    // Set up canvas for high-DPI displays
+    setupHighDPI() {
+        if (!this.canvas) return;
+        const ctx = this.canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        const rect = this.canvas.getBoundingClientRect();
+        this.canvas.width = rect.width * dpr;
+        this.canvas.height = rect.height * dpr;
+        ctx.scale(dpr, dpr);
+        this.canvas.style.width = `${rect.width}px`;
+        this.canvas.style.height = `${rect.height}px`;
+    }
+
+    // Update font size based on canvas width and screen resolution
     updateFontSize() {
         if (!this.canvas) return;
-        // Рассчитываем размер шрифта как процент от ширины канваса
-        const scaleFactor = Math.min(this.canvas.width / 600, 1); // Нормируем относительно 600px
-        this.fontSize = `${this.baseFontSize * scaleFactor}px`;
-        this.font = `${this.fontSize} ${this.fontFamily}`;
-        // Адаптируем отступы и радиус фона пропорционально
+        const dpr = window.devicePixelRatio || 1;
+        const minFontSize = 14; // Minimum font size to ensure readability
+        const scaleFactor = Math.min(this.canvas.width / (600 * dpr), 1.2); // Adjusted for smaller screens
+        this.fontSize = Math.max(this.baseFontSize * scaleFactor, minFontSize);
+        this.font = `${this.fontSize}px ${this.fontFamily}`;
+        // Adapt padding, corner radius, and effects proportionally
         this.padding = 10 * scaleFactor;
         this.cornerRadius = 8 * scaleFactor;
-        this.strokeWidth = 1 * scaleFactor;
-        this.shadowBlur = 3 * scaleFactor;
+        this.strokeWidth = Math.max(1 * scaleFactor, 1); // Minimum stroke width
+        this.shadowBlur = Math.max(3 * scaleFactor, 2); // Minimum shadow blur
     }
 
     draw(ctx) {
@@ -323,40 +341,49 @@ export class Subtitle {
 
         ctx.save();
 
-        // Обновляем шрифт перед отрисовкой
+        // Optimize for high-DPI rendering
         ctx.font = this.font;
         ctx.textAlign = this.textAlign;
         ctx.textBaseline = this.textBaseline;
         ctx.globalAlpha = this.opacity;
 
-        // Измеряем текст
+        // Measure text
         const textWidth = ctx.measureText(this.text).width;
-        const textHeight = parseFloat(this.fontSize) * 1.2;
+        const textHeight = this.fontSize * 1.2;
 
-        // Координаты для фона
+        // Background coordinates
         const bgX = this.position.x - textWidth / 2 - this.padding;
         const bgY = this.position.y - textHeight / 2 - this.padding;
         const bgWidth = textWidth + this.padding * 2;
         const bgHeight = textHeight + this.padding * 2;
 
-        // Рисуем фон
+        // Draw background
         ctx.fillStyle = this.backgroundColor;
         ctx.beginPath();
         ctx.roundRect(bgX, bgY, bgWidth, bgHeight, this.cornerRadius);
         ctx.fill();
 
-        // Эффекты текста
-        ctx.shadowColor = this.shadowColor;
-        ctx.shadowBlur = this.shadowBlur;
-        ctx.shadowOffsetX = this.shadowOffsetX;
-        ctx.shadowOffsetY = this.shadowOffsetY;
+        // Simplify effects for smaller screens
+        if (this.canvas.width < 400 * (window.devicePixelRatio || 1)) {
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = Math.max(this.shadowBlur * 0.5, 1);
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            ctx.strokeStyle = this.strokeColor;
+            ctx.lineWidth = Math.max(this.strokeWidth * 0.5, 0.5);
+        } else {
+            ctx.shadowColor = this.shadowColor;
+            ctx.shadowBlur = this.shadowBlur;
+            ctx.shadowOffsetX = this.shadowOffsetX;
+            ctx.shadowOffsetY = this.shadowOffsetY;
+            ctx.strokeStyle = this.strokeColor;
+            ctx.lineWidth = this.strokeWidth;
+        }
 
-        // Обводка текста
-        ctx.strokeStyle = this.strokeColor;
-        ctx.lineWidth = this.strokeWidth;
+        // Draw text stroke
         ctx.strokeText(this.text, this.position.x, this.position.y);
 
-        // Основной текст
+        // Draw main text
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, this.position.x, this.position.y);
 
@@ -385,21 +412,5 @@ export class Subtitle {
     updateText(newText) {
         this.text = newText;
     }
-
-    // Показ случайной реакции для указанного типа
-    // showReaction(type) {
-    //     const currentTime = Date.now();
-    //     if (currentTime - this.lastReactionTime < this.reactionCoolDown) return;
-
-    //     const reactionList = this.reactions[type] || [];
-    //     if (reactionList.length === 0) return;
-
-    //     const randomReaction = reactionList[Math.floor(Math.random() * reactionList.length)];
-    //     this.updateText(randomReaction);
-    //     this.show(1000);
-    //     setTimeout(() => this.hide(1000), 3000); // Скрыть через 3 секунды
-    //     this.lastReactionTime = currentTime;
-    // }
 }
-
 
