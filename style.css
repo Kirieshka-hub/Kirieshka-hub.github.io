@@ -1,0 +1,75 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    background-image: url('img/back2.jpg');
+    background-size: cover; /* Добавлено для корректного отображения фона */
+    background-position: center; /* Центрируем фоновое изображение */
+    font-family: Arial, sans-serif;
+    position: relative; /* Для псевдоэлемента затемнения */
+}
+
+/* body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 0;
+} */
+
+.timer-container {
+    cursor: default;
+    user-select: none;
+    text-align: center;
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.7); /* Полупрозрачный белый */
+    backdrop-filter: blur(8px); /* Размытие фона для эффекта матового стекла */
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4); /* Светлая граница для контраста */
+}
+
+.timer-display {
+    font-size: 10rem;
+    font-weight: bold;
+    color: #333; /* Темный цвет для хорошей читаемости */
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Легкая тень для контраста */
+}
+
+.sound {
+    position: fixed; /* Изменено на fixed */
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 3;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.sound_icon {
+    width: clamp(30px, 8vw, 50px); /* Адаптивный размер иконки */
+    display: block;
+}
+
+.canvas {
+    position: absolute;
+    z-index: 1;
+}
+
